@@ -3,111 +3,109 @@
 <head>
     <meta charset="utf-8">
     <title>Generador de PDF Premium - SEMP</title>
-    <meta name="description" content="Genera documentos PDF profesionales. Versión gratuita con marca de agua o versión premium sin marca de agua por $5.00 MXN">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
-    <!-- Loader overlay -->
-    <div id="loader" class="loader-overlay">
-        <div class="loader-content">
-            <div class="spinner"></div>
-            <p>Procesando pago...</p>
+    <div style="text-align: center; margin: 20px 0;">
+        <button type="button" onclick="generarPDF()"
+                style="background-color: #ff4444; color: white; padding: 10px 20px; margin: 10px; border: none; border-radius: 5px; font-weight: bold;">
+            🧪 PRUEBAS NUCLEARES (TEMPORAL)
+        </button>
+        <br>
+
+        <button type="button" onclick="generarPDFGratuito()"
+                style="background-color: #28a745; color: white; padding: 15px 25px; margin: 10px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+            📄 Descargar PDF GRATIS (con marca de agua)
+        </button>
+        <br>
+
+        <div class="mercadopago-button-container" id="mpButtonWrapper">
+            <div class="payment-title-container">
+                💳 Pagar $5.00 MXN para PDF Premium (Mercado Pago)
+            </div>
+            <button type="button" id="payButton" onclick="initiateMercadoPagoPayment()" 
+                    style="background-color: #009ee3; color: white; padding: 15px 25px; margin: 10px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+                💳 Crear Pago con MercadoPago
+            </button>
         </div>
     </div>
 
-    <div class="container">
-        <header>
-            <h1><i class="fas fa-file-pdf"></i> Generador de PDF Premium</h1>
-            <p class="subtitle">Obtén tu documento PDF profesional</p>
-        </header>
+    <hr style="margin: 30px 0;">
 
-        <!-- Main action buttons -->
-        <div class="action-buttons">
-            <button type="button" onclick="generarPDFGratuito()" class="btn btn-free">
-                <i class="fas fa-file-pdf"></i>
-                Descargar PDF GRATIS
-                <small>(con marca de agua)</small>
-            </button>
-
-            <div class="premium-section">
-                <div class="price-tag">
-                    <span class="currency">$</span>
-                    <span class="amount">5.00</span>
-                    <span class="currency">MXN</span>
-                </div>
-                
-                <button type="button" id="payButton" onclick="initiateMercadoPagoPayment()" class="btn btn-premium">
-                    <i class="fas fa-credit-card"></i>
-                    Comprar PDF Premium
-                    <small>(sin marca de agua)</small>
-                </button>
-
-                <!-- MercadoPago button container (will be populated dynamically) -->
-                <div id="mercadopago-button" style="display: none;"></div>
-            </div>
-
-            <!-- Test button (temporary) -->
-            <button type="button" onclick="generarPDF()" class="btn btn-test">
-                <i class="fas fa-flask"></i>
-                🧪 PRUEBAS NUCLEARES (TEMPORAL)
-            </button>
-        </div>
-
-        <!-- Notifications -->
-        <div id="notificacionExito" class="notification success" style="display: none;">
-            <i class="fas fa-check-circle"></i>
-            <div>
-                <strong>¡Felicidades!</strong>
-                <p>Tu pago fue exitoso. Ahora ya puedes descargar tu PDF Premium sin marca de agua.</p>
-            </div>
-        </div>
-
-        <div id="notificacionErrorPago" class="notification error" style="display: none;">
-            <i class="fas fa-times-circle"></i>
-            <div>
-                <strong>Error en el pago</strong>
-                <p>Tu operación de pago fue interrumpida o rechazada. Por favor, inténtalo de nuevo si deseas el PDF Premium.</p>
-            </div>
-        </div>
-
-        <div id="notificacionPendiente" class="notification warning" style="display: none;">
-            <i class="fas fa-clock"></i>
-            <div>
-                <strong>Pago pendiente</strong>
-                <p>Tu pago está siendo procesado. Te notificaremos cuando se complete.</p>
-            </div>
-        </div>
-
-        <!-- Premium download button -->
-        <div class="premium-download">
-            <button type="button" id="btnPremium" onclick="generarPDFPremium()" class="btn btn-gold" style="display: none;">
-                <i class="fas fa-star"></i>
-                Descargar PDF PREMIUM
-                <small>(sin marca de agua)</small>
-            </button>
-        </div>
-
-        <!-- Footer -->
-        <footer>
-            <p>Powered by <strong>SEMP</strong> - Secure PDF Generation</p>
-            <small>Pagos seguros procesados por Mercado Pago</small>
-        </footer>
+    <div id="notificacionExito" style="display: none; background-color: #d4edda; color: #155724; padding: 15px; margin: 10px auto; border: 1px solid #c3e6cb; border-radius: 5px; max-width: 500px;">
+        🎉 ¡Felicidades! Tu pago fue exitoso. Ahora ya puedes descargar tu PDF Premium sin marca de agua.
     </div>
 
-    <!-- Scripts -->
+    <div id="notificacionErrorPago" style="display: none; background-color: #f8d7da; color: #721c24; padding: 15px; margin: 10px auto; border: 1px solid #f5c6cb; border-radius: 5px; max-width: 500px;">
+        ❌ Tu operación de pago fue INTERRUMPIDA o RECHAZADA. Por favor, inténtalo de nuevo si deseas el PDF Premium.
+    </div>
+
+    <div style="text-align: center; margin: 20px 0;">
+        <button type="button" id="btnPremium" onclick="generarPDFPremium()"
+                style="display: none; background-color: #ffd700; color: #333; padding: 15px 25px; margin: 10px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+            ⭐ Descargar PDF PREMIUM (sin marca de agua)
+        </button>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
         window.jspdf = window.jspdf || {};
-        // Global variable for premium access control
         let isPremiumUnlocked = false;
-        
-        // Backend API URL - change this to your deployed backend URL
-        const API_BASE_URL = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8000' 
-            : 'https://your-backend-url.herokuapp.com'; // Change this to your actual backend URL
+        let mercadoPagoInstance = null;
+
+        // Inicializar MercadoPago con tu Public Key
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                mercadoPagoInstance = new MercadoPago('APP_USR-25f67f49-65da-48d5-a565-c0a1520a2be6', {
+                    locale: 'es-MX'
+                });
+                console.log('MercadoPago SDK inicializado correctamente');
+            } catch (error) {
+                console.error('Error inicializando MercadoPago SDK:', error);
+            }
+        });
+
+        // Función para crear pago con MercadoPago
+        async function initiateMercadoPagoPayment() {
+            console.log('Creando pago con MercadoPago...');
+            
+            if (!mercadoPagoInstance) {
+                alert('Error: MercadoPago no está disponible. Recarga la página.');
+                return;
+            }
+
+            try {
+                const currentUrl = window.location.origin + window.location.pathname;
+                
+                // Crear checkout directo con MercadoPago
+                const checkout = mercadoPagoInstance.checkout({
+                    preference: {
+                        items: [{
+                            title: 'PDF Premium - Sin marca de agua',
+                            quantity: 1,
+                            currency_id: 'MXN',
+                            unit_price: 5.00
+                        }],
+                        back_urls: {
+                            success: currentUrl + '?status=approved',
+                            failure: currentUrl + '?status=rejected',
+                            pending: currentUrl + '?status=pending'
+                        },
+                        auto_return: 'approved'
+                    }
+                });
+
+                // Abrir el checkout
+                checkout.open();
+                
+            } catch (error) {
+                console.error('Error creando pago:', error);
+                alert('Error al procesar el pago: ' + error.message);
+            }
+        }
     </script>
     <script src="script.js"></script>
     <script src="script2.js"></script>
