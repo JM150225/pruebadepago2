@@ -1,17 +1,148 @@
 // script.js
 // ===============================
-// *Generación del Documento PDF Original*
+// *Main PDF Generation and MercadoPago Integration*
 // ===============================
 
-// Variable global para controlar el acceso al PDF Premium
-let isPremiumUnlocked = false; // Inicialmente, el PDF Premium está bloqueado
+// Global variables
+let isPremiumUnlocked = false;
+let mercadoPagoInstance = null;
 
+// Initialize MercadoPago when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize MercadoPago SDK
+    try {
+        mercadoPagoInstance = new MercadoPago('TEST-a3d2c9af-3dc4-4c86-9c64-0e8b55d08cd9', {
+            locale: 'es-MX'
+        });
+        console.log('MercadoPago SDK initialized successfully');
+    } catch (error) {
+        console.error('Error initializing MercadoPago SDK:', error);
+    }
+});
+
+// Show/Hide loader
+function showLoader() {
+    document.getElementById('loader').style.display = 'flex';
+}
+
+function hideLoader() {
+    document.getElementById('loader').style.display = 'none';
+}
+
+// MercadoPago Payment Integration
+async function initiateMercadoPagoPayment() {
+    console.log('Initiating MercadoPago payment...');
+    
+    if (!mercadoPagoInstance) {
+        alert('Error: MercadoPago no está disponible. Por favor, recarga la página.');
+        return;
+    }
+
+    showLoader();
+    
+    try {
+        // Create payment preference
+        const preference = await createPaymentPreference();
+        
+        if (!preference || !preference.id) {
+            throw new Error('No se pudo crear la preferencia de pago');
+        }
+
+        console.log('Preference created:', preference.id);
+        
+        // Create checkout
+        const checkout = mercadoPagoInstance.checkout({
+            preference: {
+                id: preference.id
+            },
+            render: {
+                container: '#mercadopago-button',
+                label: 'Pagar con MercadoPago'
+            }
+        });
+
+        // Show the MercadoPago button
+        document.getElementById('mercadopago-button').style.display = 'block';
+        document.getElementById('payButton').style.display = 'none';
+        
+        hideLoader();
+        
+    } catch (error) {
+        console.error('Error creating MercadoPago payment:', error);
+        hideLoader();
+        alert('Error al procesar el pago: ' + error.message);
+    }
+}
+
+// Create payment preference via backend
+async function createPaymentPreference() {
+    const currentUrl = window.location.origin + window.location.pathname;
+    
+    const preferenceData = {
+        items: [{
+            id: 'pdf_premium',
+            title: 'PDF Premium - Sin marca de agua',
+            description: 'Descarga del documento PDF sin marca de agua',
+            quantity: 1,
+            currency_id: 'MXN',
+            unit_price: 5.00
+        }],
+        back_urls: {
+            success: currentUrl + '?status=approved',
+            failure: currentUrl + '?status=rejected',
+            pending: currentUrl + '?status=pending'
+        },
+        auto_return: 'approved',
+        external_reference: 'pdf_premium_' + Date.now(),
+        notification_url: API_BASE_URL + '/webhook/mercadopago'
+    };
+
+    try {
+        const response = await fetch(API_BASE_URL + '/create-preference', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(preferenceData)
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const preference = await response.json();
+        return preference;
+        
+    } catch (error) {
+        console.error('Error creating preference:', error);
+        
+        // Fallback: try to create preference directly (for development)
+        if (window.location.hostname === 'localhost') {
+            console.log('Fallback: Creating preference locally for development');
+            return await createLocalPreference(preferenceData);
+        }
+        
+        throw error;
+    }
+}
+
+// Fallback function for local development
+async function createLocalPreference(preferenceData) {
+    // This is a simplified version for local testing
+    // In production, this should always go through your backend
+    return {
+        id: 'test-preference-' + Date.now(),
+        sandbox_init_point: '#'
+    };
+}
+
+// Original PDF generation function
 function generarPDF() {
-    console.log("Intentando generar PDF...");
+    console.log("Generating PDF...");
 
     if (typeof jspdf === 'undefined' || typeof jspdf.jsPDF === 'undefined') {
-        console.error("Error: La librería jsPDF no está cargada o no se encontró.");
-        alert("Error al generar el PDF. La librería necesaria no está disponible.");
+        console.error("Error: jsPDF library is not loaded.");
+        alert("Error generating PDF. Required library is not available.");
         return;
     }
 
@@ -28,33 +159,55 @@ function generarPDF() {
     const contentWidth = pageWidth - (margin * 2);
     let currentY = margin;
 
-    const loremIpsumText = `Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+    // Sample document content
+    const documentContent = `DOCUMENTO PROFESIONAL PDF
 
-    Mauris placerat eleifend leo, id finibus dolor tristique vel. Proin a tortor id massa finibus tincidunt. Suspendisse potenti. Nam non turpis eu mauris luctus eleifend vel ac diam. Aliquam erat volutpat. Praesent congue, orci vel vulputate cursus, nisl enim scelerisque libero, vel placerat enim mauris vel quam. Vivamus sit amet odio at nisl dapibus dapibus. Cras sit amet odio vel massa vehicula feugiat.
+Este es un documento PDF profesional generado por el sistema SEMP.
 
-    Fusce varius, arcu vitae eleifend fermentum, erat nisi fringilla magna, nec iaculis libero velit id tortor. Donec euismod nulla id eros ultrices, sit amet volutpat lacus blandit. Sed auctor, lectus a viverra malesuada, enim quam posuere libero, quis malesuada lacus ipsum sit amet purus. Nam vel semper odio. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Donec id sapien in leo eleifend consequat.
+CARACTERÍSTICAS DEL DOCUMENTO:
+• Formato profesional de alta calidad
+• Contenido estructurado y bien organizado  
+• Compatible con todos los lectores de PDF
+• Optimizado para impresión y visualización digital
 
-    Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla facilisi. Sed non risus at sapien eleifend rhoncus. Integer feugiat, mauris vel aliquam bibendum, sem ex laoreet mauris, vitae dignissim leo felis a justo. Proin tristique leo sit amet libero efficitur, vel vulputate felis commodo. Suspendisse potenti. Integer tincidunt libero eu odio feugiat, id feugiat metus accumsan.
+CONTENIDO PRINCIPAL:
 
-    Curabitur vitae diam non odio scelerisque fringilla. Nam euismod, arcu in ultrices tempor, sapien turpis consectetur nisi, ac ullamcorper orci libero id metus. Maecenas sed lectus a velit facilisis varius. Ut eget lacus sit amet odio consectetur consectetur. Morbi aliquet, justo ac ultrices feugiat, nisl odio venenatis ipsum, eu ultrices velit enim vel lacus. Sed quis metus nec neque lacinia feugiat.
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
 
-    Donec consequat velit nec diam ultrices, sit amet tempor nisl eleifend. Quisque ac tortor a erat cursus ullamcorper. Vestibulum in arcu euismod, luctus nunc vel, interdum sapien. Nullam eget massa non eros tincidunt fermentum. Aliquam erat volutpat. Sed et magna sit amet mauris vehicula dictum. Aliquam nec arcu id arcu dignissim malesuada. Aenean eu ex nec urna vehicula efficitur.
+Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-    Phasellus nec sem vitae velit consequat posuere. In hac habitasse platea dictumst. Quisque vel velit a leo auctor malesuada. Nunc malesuada metus vel libero varius, vel cursus ipsum interdum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus aliquet, enim a volutpat aliquet, lorem libero gravida felis, in malesuada enim sapien vel justo.
+Mauris placerat eleifend leo, id finibus dolor tristique vel. Proin a tortor id massa finibus tincidunt. Suspendisse potenti. Nam non turpis eu mauris luctus eleifend vel ac diam. Aliquam erat volutpat.
 
-    Etiam in elit ac nisl facilisis tincidunt. Suspendisse potenti. Ut ac nunc vel sapien blandit euismod. Nam vel nulla sit amet odio vestibulum luctus. Proin sit amet nulla a nisi luctus fringilla. Aliquam ac magna in risus tincidunt interdum. Sed vel sapien quis turpis aliquam interdum. Integer vitae lectus sit amet orci ullamcorper hendrerit.
+SECCIÓN TÉCNICA:
 
-    Donec at odio sit amet libero consequat fermentum. Suspendisse potenti. Mauris nec tortor in libero fringilla rhoncus. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nunc tincidunt ipsum non nisi consequat, at facilisis nunc feugiat. Sed euismod, justo vel ultrices scelerisque, sapien libero dignissim felis, non dignissim enim sem vel nisi. Nulla facilisi.
+Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus aliquet, enim a volutpat aliquet, lorem libero gravida felis, in malesuada enim sapien vel justo.
 
-    Quisque vel velit a leo auctor malesuada. Nunc malesuada metus vel libero varius, vel cursus ipsum interdum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Vivamus aliquet, enim a volutpat aliquet, lorem libero gravida felis, in malesuada enim sapien vel justo.`;
+Etiam in elit ac nisl facilisis tincidunt. Suspendisse potenti. Ut ac nunc vel sapien blandit euismod. Nam vel nulla sit amet odio vestibulum luctus.
 
-    const lineHeight = 7;
-    const paddingBottom = 3;
-    const paragraphs = loremIpsumText.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+CONCLUSIONES:
 
-    doc.setFontSize(8);
+Este documento representa un ejemplo de contenido profesional de alta calidad que puede ser generado por nuestro sistema. La versión premium ofrece contenido sin marca de agua para uso comercial y profesional.`;
+
+    const lineHeight = 6;
+    const paragraphs = documentContent.split('\n').map(p => p.trim()).filter(p => p.length > 0);
+
+    // Set font and generate content
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
 
     for (const paragraph of paragraphs) {
+        if (paragraph.startsWith('DOCUMENTO PROFESIONAL PDF')) {
+            doc.setFontSize(16);
+            doc.setFont('helvetica', 'bold');
+        } else if (paragraph.includes('CARACTERÍSTICAS') || paragraph.includes('CONTENIDO PRINCIPAL') || 
+                   paragraph.includes('SECCIÓN TÉCNICA') || paragraph.includes('CONCLUSIONES')) {
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+        } else {
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+        }
+
         const textLines = doc.splitTextToSize(paragraph, contentWidth);
         const paragraphHeight = textLines.length * lineHeight;
 
@@ -64,30 +217,91 @@ function generarPDF() {
         }
 
         doc.text(textLines, margin, currentY);
-        currentY += paragraphHeight + paddingBottom;
+        currentY += paragraphHeight + 8; // Extra spacing between paragraphs
     }
 
     try {
-        doc.save('SEMP.pdf');
-        console.log("Generando PDF...");
-        alert("¡Solicitud de Empleo generada en PDF!");
-    } catch (e) {
-        console.error("Error al guardar el PDF:", e);
-        alert("Hubo un error al intentar guardar el PDF.");
+        doc.save('SEMP-Premium.pdf');
+        console.log("PDF generated successfully");
+        alert("¡Documento PDF generado exitosamente!");
+    } catch (error) {
+        console.error("Error saving PDF:", error);
+        alert("Error al guardar el PDF.");
     }
 }
 
-// Puedes mantener también la lógica de desbloqueo premium aquí si prefieres
-// Esto asume que generarPDFPremium llamará a generarPDF
+// Premium PDF generation (without watermark)
 function generarPDFPremium() {
-    console.log("Intentando generar PDF PREMIUM sin marca de agua...");
+    console.log("Attempting to generate Premium PDF...");
 
     if (!isPremiumUnlocked) {
         alert("¡Acceso denegado! El PDF Premium solo está disponible después de un pago exitoso.");
-        console.warn("Intento de acceso a PDF Premium sin desbloquear.");
+        console.warn("Attempted access to Premium PDF without unlocking.");
         return;
     }
 
-    console.log("Generando PDF PREMIUM (sin marca de agua)...");
-    generarPDF(); // Llama a la función del PDF sin marca de agua
+    console.log("Generating Premium PDF (without watermark)...");
+    generarPDF(); // Calls the main PDF generation function
 }
+
+// Utility function to reset payment state
+function resetPaymentState() {
+    isPremiumUnlocked = false;
+    document.getElementById('notificacionExito').style.display = 'none';
+    document.getElementById('notificacionErrorPago').style.display = 'none';
+    document.getElementById('notificacionPendiente').style.display = 'none';
+    document.getElementById('btnPremium').style.display = 'none';
+    document.getElementById('mercadopago-button').style.display = 'none';
+    document.getElementById('payButton').style.display = 'block';
+}
+
+// Function to validate payment on page load
+async function validatePaymentStatus() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentId = urlParams.get('payment_id');
+    const status = urlParams.get('status');
+    
+    if (paymentId && status) {
+        showLoader();
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/validate-payment/${paymentId}`);
+            const paymentData = await response.json();
+            
+            if (paymentData.status === 'approved') {
+                isPremiumUnlocked = true;
+                showSuccessNotification();
+            } else {
+                showErrorNotification();
+            }
+            
+        } catch (error) {
+            console.error('Error validating payment:', error);
+            // Fallback to URL parameter validation
+            if (status === 'approved') {
+                isPremiumUnlocked = true;
+                showSuccessNotification();
+            } else {
+                showErrorNotification();
+            }
+        } finally {
+            hideLoader();
+            // Clean URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+}
+
+function showSuccessNotification() {
+    document.getElementById('notificacionExito').style.display = 'block';
+    document.getElementById('btnPremium').style.display = 'block';
+}
+
+function showErrorNotification() {
+    document.getElementById('notificacionErrorPago').style.display = 'block';
+}
+
+// Initialize payment validation on page load
+document.addEventListener('DOMContentLoaded', function() {
+    validatePaymentStatus();
+});
