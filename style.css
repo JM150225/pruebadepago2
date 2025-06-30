@@ -1,73 +1,346 @@
-/* Estilos existentes de Mercado Pago */
-        .payment-title-container {
-            text-align: center;
-            margin-bottom: 5px;
-            display: inline-block;
-            padding: 8px 15px;
-            border: 2px solid #007bff;
-            border-radius: 10px;
-            background-color: #f8f9fa;
-            color: #333;
-            font-family: Arial, sans-serif;
-            font-size: 1.1em;
-            font-weight: bold;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .mercadopago-button-container {
-            text-align: center;
-        }
-        .mercadopago-button-container .mercadopago-button {
-            display: inline-block;
-        }
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        /* Estilos para la sección de Openpay (ajustados para que no interfieran con tus estilos existentes) */
-        /* Asegúrate de que .openpay-container no se llame 'container' si ya usas 'container' en style.css */
-        .openpay-section {
-            max-width: 500px;
-            margin: 20px auto; /* Agregamos un margen superior para separarlo visualmente */
-            border: 1px solid #ccc;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
-            background-color: #fff; /* Asegura un fondo blanco */
-        }
-        .openpay-section label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        .openpay-section input[type="text"],
-        .openpay-section input[type="number"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-        .openpay-section button {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .openpay-section button:hover {
-            background-color: #0056b3;
-        }
-        #openpay-error {
-            color: red;
-            margin-top: 10px;
-        }
-        #openpay-success {
-            color: green;
-            margin-top: 10px;
-        }
-        .divisor {
-            margin: 40px auto;
-            width: 80%;
-            border: 0;
-            height: 1px;
-            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
-        }
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Header */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+header h1 i {
+    margin-right: 15px;
+    color: #ffd700;
+}
+
+.subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    font-weight: 300;
+}
+
+/* Action buttons */
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+/* Button base styles */
+.btn {
+    padding: 20px 30px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.btn:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.5s;
+}
+
+.btn:hover:before {
+    left: 100%;
+}
+
+.btn i {
+    font-size: 1.3rem;
+}
+
+.btn small {
+    font-size: 0.9rem;
+    font-weight: 400;
+    opacity: 0.8;
+}
+
+/* Button variants */
+.btn-free {
+    background: linear-gradient(135deg, #28a745, #20c997);
+    color: white;
+}
+
+.btn-free:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.btn-premium {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.btn-premium:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+}
+
+.btn-gold {
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    color: #333;
+}
+
+.btn-gold:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+}
+
+.btn-test {
+    background: linear-gradient(135deg, #ff4444, #cc0000);
+    color: white;
+    font-size: 0.9rem;
+}
+
+.btn-test:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(255, 68, 68, 0.4);
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Premium section */
+.premium-section {
+    position: relative;
+    padding: 20px;
+    background: rgba(255,255,255,0.95);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.price-tag {
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.price-tag .currency {
+    font-size: 1.2rem;
+}
+
+.price-tag .amount {
+    font-size: 2rem;
+    margin: 0 5px;
+}
+
+/* Premium download */
+.premium-download {
+    text-align: center;
+    margin: 20px 0;
+}
+
+/* Notifications */
+.notification {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification i {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.notification.success {
+    background: linear-gradient(135deg, #d4edda, #c3e6cb);
+    color: #155724;
+    border-left: 4px solid #28a745;
+}
+
+.notification.error {
+    background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+    color: #721c24;
+    border-left: 4px solid #dc3545;
+}
+
+.notification.warning {
+    background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+    color: #856404;
+    border-left: 4px solid #ffc107;
+}
+
+.notification strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.notification p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* Loader */
+.loader-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loader-content {
+    text-align: center;
+    color: white;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: auto;
+    padding-top: 40px;
+    color: rgba(255,255,255,0.8);
+}
+
+footer p {
+    margin-bottom: 5px;
+}
+
+footer strong {
+    color: #ffd700;
+}
+
+footer small {
+    font-size: 0.85rem;
+    opacity: 0.7;
+}
+
+/* MercadoPago button styling */
+#mercadopago-button {
+    margin-top: 15px;
+}
+
+#mercadopago-button .mercadopago-button {
+    width: 100%;
+    max-width: none;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    header h1 {
+        font-size: 2rem;
+    }
+    
+    .btn {
+        padding: 15px 20px;
+        font-size: 1rem;
+    }
+    
+    .price-tag .amount {
+        font-size: 1.5rem;
+    }
+    
+    .notification {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .subtitle {
+        font-size: 1rem;
+    }
+    
+    .btn {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Hide elements during loading */
+.loading .action-buttons {
+    opacity: 0.5;
+    pointer-events: none;
+}
