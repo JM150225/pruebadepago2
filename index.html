@@ -1,0 +1,89 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>3 BOTONES DEL DESTINO</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+    <script type="text/javascript" src="https://js.openpay.mx/openpay.v1.min.js"></script>
+    <script type="text/javascript" src="https://js.openpay.mx/openpay-data.v1.min.js"></script>
+
+</head>
+<body>
+
+<div style="text-align: center; margin: 20px 0;">
+    <button type="button" onclick="generarPDF()"
+            style="background-color: #ff4444; color: white; padding: 10px 20px; margin: 10px; border: none; border-radius: 5px; font-weight: bold;">
+        🧪 PRUEBAS NUCLEARES (TEMPORAL)
+    </button>
+    <br>
+
+    <button type="button" onclick="generarPDFGratuito()"
+            style="background-color: #28a745; color: white; padding: 15px 25px; margin: 10px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+        📄 Descargar PDF GRATIS (con marca de agua)
+    </button>
+    <br>
+
+    <div class="mercadopago-button-container" id="mpButtonWrapper">
+        <div class="payment-title-container">
+            💳 Pagar $5.00 MXN para PDF Premium (Mercado Pago)
+        </div>
+        <script src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
+                data-preference-id="787997534-6dad21a1-6145-4f0d-ac21-66bf7a5e7a58" data-source="button">
+        </script>
+    </div>
+</div>
+
+<hr class="divisor">
+
+<div class="openpay-section">
+    <h2>Pago de Prueba Openpay</h2>
+    <form id="openpay-payment-form"> <label for="card-number">Número de Tarjeta:</label>
+        <input type="text" id="card-number" data-openpay-card="card_number" required>
+
+        <label for="card-name">Nombre en la Tarjeta:</label>
+        <input type="text" id="card-name" data-openpay-card="holder_name" required>
+
+        <label for="card-exp-month">Mes de Expiración (MM):</label>
+        <input type="number" id="card-exp-month" data-openpay-card="expiration_month" placeholder="MM" min="1" max="12" required>
+
+        <label for="card-exp-year">Año de Expiración (AA):</label>
+        <input type="number" id="card-exp-year" data-openpay-card="expiration_year" placeholder="AA" min="20" required>
+
+        <label for="card-cvv">CVV:</label>
+        <input type="text" id="card-cvv" data-openpay-card="cvv2" required>
+
+        <button type="submit" id="openpay-pay-button">Realizar Pago de Prueba Openpay</button>
+
+        <div id="openpay-error" style="display: none;"></div>
+        <div id="openpay-success" style="display: none;"></div>
+    </form>
+</div>
+
+<div id="notificacionExito" style="display: none; background-color: #d4edda; color: #155724; padding: 15px; margin: 10px auto; border: 1px solid #c3e6cb; border-radius: 5px; max-width: 500px;">
+    🎉 ¡Felicidades! Tu pago fue exitoso. Ahora ya puedes descargar tu PDF Premium sin marca de agua.
+</div>
+
+<div id="notificacionErrorPago" style="display: none; background-color: #f8d7da; color: #721c24; padding: 15px; margin: 10px auto; border: 1px solid #f5c6cb; border-radius: 5px; max-width: 500px;">
+    ❌ Tu operación de pago fue INTERRUMPIDA o RECHAZADA. Por favor, inténtalo de nuevo si deseas el PDF Premium.
+</div>
+
+<div style="text-align: center; margin: 20px 0;">
+    <button type="button" id="btnPremium" onclick="generarPDFPremium()"
+            style="display: none; background-color: #ffd700; color: #333; padding: 15px 25px; margin: 10px; border: none; border-radius: 5px; font-weight: bold; font-size: 16px;">
+        ⭐ Descargar PDF PREMIUM (sin marca de agua)
+    </button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+    window.jspdf = window.jspdf || {};
+    // La variable global para el premium debe estar accesible para todos los scripts
+    let isPremiumUnlocked = false; //
+</script>
+<script src="script.js"></script>
+<script src="script2.js"></script> <script src="openpay.js"></script> <script src="mercadopago_status_handler.js"></script> </body>
+</html>

@@ -1,0 +1,73 @@
+/* Estilos existentes de Mercado Pago */
+        .payment-title-container {
+            text-align: center;
+            margin-bottom: 5px;
+            display: inline-block;
+            padding: 8px 15px;
+            border: 2px solid #007bff;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+            color: #333;
+            font-family: Arial, sans-serif;
+            font-size: 1.1em;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .mercadopago-button-container {
+            text-align: center;
+        }
+        .mercadopago-button-container .mercadopago-button {
+            display: inline-block;
+        }
+
+        /* Estilos para la sección de Openpay (ajustados para que no interfieran con tus estilos existentes) */
+        /* Asegúrate de que .openpay-container no se llame 'container' si ya usas 'container' en style.css */
+        .openpay-section {
+            max-width: 500px;
+            margin: 20px auto; /* Agregamos un margen superior para separarlo visualmente */
+            border: 1px solid #ccc;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+            background-color: #fff; /* Asegura un fondo blanco */
+        }
+        .openpay-section label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .openpay-section input[type="text"],
+        .openpay-section input[type="number"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .openpay-section button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .openpay-section button:hover {
+            background-color: #0056b3;
+        }
+        #openpay-error {
+            color: red;
+            margin-top: 10px;
+        }
+        #openpay-success {
+            color: green;
+            margin-top: 10px;
+        }
+        .divisor {
+            margin: 40px auto;
+            width: 80%;
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0));
+        }
